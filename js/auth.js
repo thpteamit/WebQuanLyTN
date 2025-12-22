@@ -23,6 +23,24 @@ function initFirebase() {
     window.__firebaseAppInitialized = true;
 }
 
+function getAppBasePath() {
+    // GitHub Pages: https://<user>.github.io/<repo>/...
+    // Detect base path as '/<repo>/' for github.io, else '/'.
+    const host = String(window.location.hostname || '');
+    const path = String(window.location.pathname || '/');
+    if (host.endsWith('github.io')) {
+        const parts = path.split('/').filter(Boolean);
+        if (parts.length > 0) return `/${parts[0]}/`;
+    }
+    return '/';
+}
+
+function appUrl(relativePath) {
+    const base = getAppBasePath();
+    const clean = String(relativePath || '').replace(/^\//, '');
+    return base + clean;
+}
+
 // Theme Toggle
 function initTheme() {
     const themeToggle = document.getElementById('themeToggle');
@@ -108,7 +126,7 @@ function waitForAuthState() {
 async function requireAuthRole(requiredRole = null) {
     const user = await waitForAuthState();
     if (!user) {
-        window.location.href = 'index.html';
+        window.location.href = appUrl('');
         return null;
     }
 
@@ -117,14 +135,14 @@ async function requireAuthRole(requiredRole = null) {
     // If role mapping is not available, deny by default
     if (!window.firebaseDb || !window.firebaseDb.getUserRole) {
         await firebase.auth().signOut();
-        window.location.href = 'index.html';
+        window.location.href = appUrl('');
         return null;
     }
 
     const role = await window.firebaseDb.getUserRole(user.uid);
     if (role !== requiredRole) {
         await firebase.auth().signOut();
-        window.location.href = 'index.html';
+        window.location.href = appUrl('');
         return null;
     }
 
@@ -151,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Role mapping requires DB helper, but index.html doesn't load it.
         // We redirect to download page by default; it will guard and redirect again if needed.
-        window.location.href = 'download.html';
+        window.location.href = appUrl('download/');
     })();
     
     loginForm.addEventListener('submit', async (e) => {
@@ -185,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Do not block login if profile sync fails
             }
 
-            window.location.href = 'download.html';
+            window.location.href = appUrl('download/');
         } catch (err) {
             showError(errorMessage, 'Tài khoản hoặc mật khẩu không đúng');
         }
@@ -210,7 +228,7 @@ function setupLogout() {
                 initFirebase();
                 await firebase.auth().signOut();
             } finally {
-                window.location.href = 'index.html';
+                window.location.href = appUrl('');
             }
         });
     }

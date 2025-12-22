@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài Nguyên THP - Quản lý tài nguyên</title>
+    <script>
+        (function () {
+            try {
+                const saved = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const useDark = saved ? saved === 'dark' : prefersDark;
+                if (useDark) document.documentElement.classList.add('dark-mode');
+            } catch (e) {
+                // ignore
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="has-header">
+    <div class="theme-toggle">
+        <button id="themeToggle" class="theme-btn"><span>Chế độ tối</span></button>
+    </div>
+
+    <div class="header">
+        <div class="header-content">
+            <h1>Quản lý tài nguyên</h1>
+            <p class="header-subtitle">Thêm, chỉnh sửa và quản lý tài nguyên của bạn</p>
+        </div>
+        <button id="logoutBtn" class="btn btn-secondary">Đăng xuất</button>
+    </div>
+
+    <div class="container">
+        <div class="admin-panel">
+            <div class="stats-grid">
+                <div class="stat-card stat-primary">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalResources">0</div>
+                        <div class="stat-label">Tổng tài nguyên</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-success">
+                    <div class="stat-icon">✓</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="todayAdded">0</div>
+                        <div class="stat-label">Thêm hôm nay</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-warning">
+                    <div class="stat-icon">🔗</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalLinks">0</div>
+                        <div class="stat-label">Tổng links</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="add-section">
+                <h2>Thêm tài nguyên mới</h2>
+                <form id="addResourceForm" class="form">
+                    <div class="form-group">
+                        <label for="resourceName">Tên tài nguyên</label>
+                        <input type="text" id="resourceName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceLink">Link tải</label>
+                        <input type="url" id="resourceLink" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceDescription">Mô tả (tùy chọn)</label>
+                        <textarea id="resourceDescription" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Thêm tài nguyên</button>
+                </form>
+            </div>
+
+            <div class="resource-list">
+                <div class="list-header">
+                    <h2>Danh sách tài nguyên</h2>
+                    <div class="list-controls">
+                        <input type="text" id="adminSearchInput" placeholder="Tìm kiếm..." class="search-input-mini">
+                        <select id="sortSelect" class="sort-select">
+                            <option value="newest">Mới nhất</option>
+                            <option value="oldest">Cũ nhất</option>
+                            <option value="name">Tên A-Z</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="resourcesContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>Chỉnh sửa tài nguyên</h2>
+            <form id="editResourceForm" class="form">
+                <input type="hidden" id="editResourceId">
+                <div class="form-group">
+                    <label for="editResourceName">Tên tài nguyên</label>
+                    <input type="text" id="editResourceName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editResourceLink">Link tải</label>
+                    <input type="url" id="editResourceLink" required>
+                </div>
+                <div class="form-group">
+                    <label for="editResourceDescription">Mô tả</label>
+                    <textarea id="editResourceDescription" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    <button type="button" id="closeModal" class="btn btn-secondary">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="../js/firebaseConfig.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/firebaseDb.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

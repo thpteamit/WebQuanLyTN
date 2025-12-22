@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLogout();
     (async () => {
         if (!window.authGuards || !window.authGuards.requireAuthRole) {
-            window.location.href = 'index.html';
+            window.location.href = '../';
             return;
         }
 

@@ -4,61 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tài Nguyên THP - Tải tài nguyên</title>
-    <script>
-        (function () {
-            try {
-                const saved = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const useDark = saved ? saved === 'dark' : prefersDark;
-                if (useDark) document.documentElement.classList.add('dark-mode');
-            } catch (e) {
-                // ignore
-            }
-        })();
-    </script>
-    <link rel="stylesheet" href="css/style.css">
+    <meta http-equiv="refresh" content="0; url=download/">
 </head>
-<body class="has-header">
-    <div class="theme-toggle">
-        <button id="themeToggle" class="theme-btn"><span>Chế độ tối</span></button>
-    </div>
-
-    <div class="header">
-        <div class="header-content">
-            <h1>Tài nguyên tải về</h1>
-            <p class="header-subtitle">Khám phá và tải xuống các tài nguyên bạn cần</p>
-        </div>
-        <button id="logoutBtn" class="btn btn-secondary">Đăng xuất</button>
-    </div>
-
-    <div class="container">
-        <div class="download-panel">
-            <div class="download-hero">
-                <h2 class="hero-title">Tìm tài nguyên của bạn</h2>
-                <div class="search-section">
-                    <div class="search-wrapper">
-                        <input type="text" id="searchInput" placeholder="Nhập từ khóa tìm kiếm..." class="search-input">
-                        <div class="search-icon">🔍</div>
-                    </div>
-                </div>
-                <div class="filter-section">
-                    <button class="filter-btn active" data-filter="all">Tất cả</button>
-                    <button class="filter-btn" data-filter="recent">Mới nhất</button>
-                    <button class="filter-btn" data-filter="popular">Phổ biến</button>
-                </div>
-            </div>
-            <div id="downloadContainer" class="download-grid"></div>
-            <div id="emptyState" class="empty-state">
-                <p>Chưa có tài nguyên nào</p>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="js/firebaseConfig.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/firebaseDb.js"></script>
-    <script src="js/download.js"></script>
+<body>
+    <script>
+        window.location.replace('download/');
+    </script>
 </body>
 </html>

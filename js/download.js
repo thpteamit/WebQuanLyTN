@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     (async () => {
         // Allow both roles to view downloads; redirect admin to admin page if role is admin.
         if (!window.authGuards || !window.authGuards.requireAuthRole) {
-            window.location.href = 'index.html';
+            window.location.href = '../';
             return;
         }
 
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (role === 'admin') {
-            window.location.href = 'admin.html';
+            window.location.href = '../admin/';
             return;
         }
 
