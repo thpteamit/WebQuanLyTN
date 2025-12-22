@@ -617,7 +617,8 @@ body.has-header .theme-toggle {
     animation: modalSlideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid var(--border-color);
     position: relative;
-    overflow: hidden;
+    overflow: auto;
+    max-height: calc(100vh - 80px);
 }
 
 .modal-content::before {
