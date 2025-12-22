@@ -78,6 +78,14 @@
                         <input type="text" id="resourceName" required>
                     </div>
                     <div class="form-group">
+                        <label for="resourceCategory">Loại</label>
+                        <select id="resourceCategory" required class="sort-select">
+                            <option value="tool" selected>Tool</option>
+                            <option value="file">File</option>
+                            <option value="other">Khác</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="resourceFile">Chọn file (tải trực tiếp, yêu cầu đăng nhập)</label>
                         <input type="file" id="resourceFile" required>
                     </div>
@@ -118,6 +126,14 @@
                 <div class="form-group">
                     <label for="editResourceName">Tên tài nguyên</label>
                     <input type="text" id="editResourceName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editResourceCategory">Loại</label>
+                    <select id="editResourceCategory" required class="sort-select">
+                        <option value="tool">Tool</option>
+                        <option value="file">File</option>
+                        <option value="other">Khác</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="editResourceFile">Đổi file (tùy chọn)</label>

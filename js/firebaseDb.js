@@ -71,6 +71,7 @@ function mapResource(id, raw) {
     return {
         id: coerceString(id),
         name: coerceString(resource.name),
+        category: coerceString(resource.category || 'other').trim().toLowerCase() || 'other',
         link: coerceString(resource.link),
         storagePath: coerceString(resource.storagePath || ''),
         fileName: coerceString(resource.fileName || ''),
@@ -95,6 +96,7 @@ async function createResource(resource) {
     const token = await getIdToken();
     const payload = {
         name: coerceString(resource.name).trim(),
+        category: coerceString(resource.category || 'other').trim().toLowerCase() || 'other',
         link: coerceString(resource.link).trim(),
         storagePath: coerceString(resource.storagePath || '').trim(),
         fileName: coerceString(resource.fileName || '').trim(),

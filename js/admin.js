@@ -177,6 +177,7 @@ function setupAddForm() {
         e.preventDefault();
         
         const name = document.getElementById('resourceName').value.trim();
+        const category = (document.getElementById('resourceCategory')?.value || 'other').trim().toLowerCase();
         const link = document.getElementById('resourceLink').value.trim();
         const description = document.getElementById('resourceDescription').value.trim();
         const fileInput = document.getElementById('resourceFile');
@@ -200,6 +201,7 @@ function setupAddForm() {
         try {
             await window.firebaseDb.createResource({
                 name,
+                category,
                 link: fileInfo ? '' : link,
                 storagePath: fileInfo ? fileInfo.storagePath : '',
                 fileName: fileInfo ? fileInfo.fileName : '',
@@ -244,6 +246,7 @@ function setupEditForm() {
         
         const id = document.getElementById('editResourceId').value;
         const name = document.getElementById('editResourceName').value.trim();
+        const category = (document.getElementById('editResourceCategory')?.value || 'other').trim().toLowerCase();
         const link = document.getElementById('editResourceLink').value.trim();
         const description = document.getElementById('editResourceDescription').value.trim();
         const fileInput = document.getElementById('editResourceFile');
@@ -264,6 +267,7 @@ function setupEditForm() {
         try {
             await window.firebaseDb.updateResource(id, {
                 name,
+                category,
                 link: fileInfo ? '' : link,
                 storagePath: fileInfo ? fileInfo.storagePath : (existing ? (existing.storagePath || '') : ''),
                 fileName: fileInfo ? fileInfo.fileName : (existing ? (existing.fileName || '') : ''),
@@ -295,6 +299,9 @@ function setupResourceActions() {
             if (resource) {
                 document.getElementById('editResourceId').value = resource.id;
                 document.getElementById('editResourceName').value = resource.name;
+                const cat = (resource.category || 'other').toString().trim().toLowerCase() || 'other';
+                const catSelect = document.getElementById('editResourceCategory');
+                if (catSelect) catSelect.value = cat;
                 document.getElementById('editResourceLink').value = resource.link;
                 document.getElementById('editResourceDescription').value = resource.description || '';
                 const fileInput = document.getElementById('editResourceFile');

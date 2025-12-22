@@ -43,7 +43,7 @@ async function fetchResources() {
 }
 
 // Current filter state
-let currentFilter = 'all';
+let currentFilter = 'tool';
 
 // Load and display downloads
 async function loadDownloads(searchTerm = '', filter = 'all') {
@@ -62,14 +62,13 @@ async function loadDownloads(searchTerm = '', filter = 'all') {
     
     let filtered = resources;
     
-    // Apply filter
-    if (filter === 'recent') {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        filtered = resources.filter(r => new Date(r.createdAt) > sevenDaysAgo);
-    } else if (filter === 'popular') {
-        // Sort by name (as we don't have view count)
-        filtered = [...resources].sort((a, b) => a.name.localeCompare(b.name));
+    // Apply category filter
+    const wanted = String(filter || '').trim().toLowerCase();
+    if (wanted === 'tool' || wanted === 'file' || wanted === 'other') {
+        filtered = resources.filter(r => {
+            const cat = String(r.category || 'other').trim().toLowerCase() || 'other';
+            return cat === wanted;
+        });
     }
     
     // Apply search
