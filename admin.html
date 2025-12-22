@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tài Nguyên THP - Quản lý tài nguyên</title>
+    <script>
+        (function () {
+            try {
+                const host = window.location.hostname;
+                const isLocal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
+                if (!isLocal && window.location.protocol === 'http:') {
+                    window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search + window.location.hash);
+                }
+            } catch (e) {
+                // ignore
+            }
+        })();
+    </script>
     <meta http-equiv="refresh" content="0; url=admin/">
 </head>
 <body>

@@ -7,6 +7,19 @@
     <script>
         (function () {
             try {
+                const host = window.location.hostname;
+                const isLocal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
+                if (!isLocal && window.location.protocol === 'http:') {
+                    window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search + window.location.hash);
+                }
+            } catch (e) {
+                // ignore
+            }
+        })();
+    </script>
+    <script>
+        (function () {
+            try {
                 const saved = localStorage.getItem('theme');
                 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                 const useDark = saved ? saved === 'dark' : prefersDark;
