@@ -94,10 +94,88 @@ async function loadDownloads(searchTerm = '', filter = 'all') {
             ${resource.description ? `<p>${escapeHtml(resource.description)}</p>` : '<p style="color: var(--text-secondary);">Không có mô tả</p>'}
             <div class="card-footer">
                 <span class="card-date">${formatDate(resource.createdAt)}</span>
-                <a href="${escapeHtml(resource.link)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Tải xuống</a>
+                ${resource.storagePath
+                    ? `<button type="button" class="btn btn-primary download-btn" data-id="${escapeHtml(resource.id)}">Tải xuống</button>`
+                    : (resource.link
+                        ? `<a href="${escapeHtml(resource.link)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Tải xuống</a>`
+                        : `<button type="button" class="btn btn-primary" disabled>Không có link</button>`
+                    )
+                }
             </div>
         </div>
     `).join('');
+
+    setupDownloadButtons();
+}
+
+function getStorageBucket() {
+    return window.FIREBASE_WEB_CONFIG && window.FIREBASE_WEB_CONFIG.storageBucket
+        ? String(window.FIREBASE_WEB_CONFIG.storageBucket)
+        : '';
+}
+
+async function downloadViaStorageApi(resource) {
+    initFirebase();
+    const user = firebase.auth().currentUser;
+    if (!user) throw new Error('Not signed in');
+
+    const bucket = getStorageBucket();
+    if (!bucket) throw new Error('Missing storageBucket in Firebase config');
+
+    const storagePath = String(resource.storagePath || '').trim();
+    if (!storagePath) throw new Error('Missing storagePath');
+
+    const idToken = await user.getIdToken();
+    const objectPath = encodeURIComponent(storagePath);
+    const url = `https://firebasestorage.googleapis.com/v0/b/${encodeURIComponent(bucket)}/o/${objectPath}?alt=media`;
+
+    const resp = await fetch(url, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${idToken}`
+        }
+    });
+
+    if (!resp.ok) {
+        const detail = await resp.text().catch(() => '');
+        throw new Error(`Download failed (${resp.status}) ${detail}`);
+    }
+
+    const blob = await resp.blob();
+    const fileName = String(resource.fileName || resource.name || 'download').trim() || 'download';
+
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = fileName;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+}
+
+function setupDownloadButtons() {
+    document.querySelectorAll('.download-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const id = e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.id : '';
+            const resource = allResources.find(r => r.id === id);
+            if (!resource) return;
+
+            e.currentTarget.disabled = true;
+            const prevText = e.currentTarget.textContent;
+            e.currentTarget.textContent = 'Đang tải...';
+
+            try {
+                await downloadViaStorageApi(resource);
+            } catch {
+                alert('Không thể tải file. Kiểm tra đăng nhập hoặc Storage Rules');
+            } finally {
+                e.currentTarget.disabled = false;
+                e.currentTarget.textContent = prevText;
+            }
+        });
+    });
 }
 
 // Format date helper

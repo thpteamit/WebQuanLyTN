@@ -78,8 +78,12 @@
                         <input type="text" id="resourceName" required>
                     </div>
                     <div class="form-group">
-                        <label for="resourceLink">Link tải</label>
-                        <input type="url" id="resourceLink" required>
+                        <label for="resourceFile">Chọn file (tải trực tiếp, yêu cầu đăng nhập)</label>
+                        <input type="file" id="resourceFile" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceLink">Link ngoài (tùy chọn)</label>
+                        <input type="url" id="resourceLink" placeholder="https://...">
                     </div>
                     <div class="form-group">
                         <label for="resourceDescription">Mô tả (tùy chọn)</label>
@@ -116,8 +120,12 @@
                     <input type="text" id="editResourceName" required>
                 </div>
                 <div class="form-group">
-                    <label for="editResourceLink">Link tải</label>
-                    <input type="url" id="editResourceLink" required>
+                    <label for="editResourceFile">Đổi file (tùy chọn)</label>
+                    <input type="file" id="editResourceFile">
+                </div>
+                <div class="form-group">
+                    <label for="editResourceLink">Link ngoài (tùy chọn)</label>
+                    <input type="url" id="editResourceLink" placeholder="https://...">
                 </div>
                 <div class="form-group">
                     <label for="editResourceDescription">Mô tả</label>
@@ -133,9 +141,10 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="../js/firebaseConfig.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/firebaseDb.js"></script>
-    <script src="../js/admin.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+    <script src="../dist/js/firebaseConfig.js"></script>
+    <script src="../dist/js/auth.js"></script>
+    <script src="../dist/js/firebaseDb.js"></script>
+    <script src="../dist/js/admin.js"></script>
 </body>
 </html>

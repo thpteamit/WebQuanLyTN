@@ -72,6 +72,9 @@ function mapResource(id, raw) {
         id: coerceString(id),
         name: coerceString(resource.name),
         link: coerceString(resource.link),
+        storagePath: coerceString(resource.storagePath || ''),
+        fileName: coerceString(resource.fileName || ''),
+        fileSize: Number(resource.fileSize || 0) || 0,
         description: coerceString(resource.description || ''),
         createdAt: coerceString(resource.createdAt || ''),
         updatedAt: coerceString(resource.updatedAt || '')
@@ -85,7 +88,7 @@ async function listResources() {
 
     return Object.entries(data)
         .map(([id, value]) => mapResource(id, value))
-        .filter(r => r.name && r.link);
+    .filter(r => r.name && (r.storagePath || r.link));
 }
 
 async function createResource(resource) {
@@ -93,6 +96,9 @@ async function createResource(resource) {
     const payload = {
         name: coerceString(resource.name).trim(),
         link: coerceString(resource.link).trim(),
+        storagePath: coerceString(resource.storagePath || '').trim(),
+        fileName: coerceString(resource.fileName || '').trim(),
+        fileSize: Number(resource.fileSize || 0) || 0,
         description: coerceString(resource.description || '').trim(),
         createdAt: resource.createdAt || new Date().toISOString()
     };

@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+
+# Optional local files
+*.log
+
+# Keep dist/ committed (GitHub Pages uses it)

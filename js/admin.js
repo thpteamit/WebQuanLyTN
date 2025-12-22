@@ -41,6 +41,55 @@ async function refreshAndRender() {
     }
 }
 
+function ensureStorageAvailable() {
+    try {
+        initFirebase();
+    } catch {
+        throw new Error('Firebase not initialized');
+    }
+    if (!window.firebase || !firebase.storage) {
+        throw new Error('Firebase Storage SDK not loaded');
+    }
+    return firebase.storage();
+}
+
+function sanitizeFileName(fileName) {
+    return String(fileName || '')
+        .replace(/[^a-zA-Z0-9._-]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+}
+
+async function uploadResourceFile(file, preferredName = '') {
+    if (!file) throw new Error('Missing file');
+    const storage = ensureStorageAvailable();
+
+    const safeName = sanitizeFileName(file.name || preferredName || 'file');
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    const path = `resources/${ts}_${safeName}`;
+
+    const ref = storage.ref(path);
+    await ref.put(file, {
+        contentType: file.type || undefined
+    });
+
+    return {
+        storagePath: path,
+        fileName: file.name || safeName,
+        fileSize: file.size || 0
+    };
+}
+
+async function deleteStorageObject(storagePath) {
+    const cleanPath = String(storagePath || '').trim();
+    if (!cleanPath) return;
+    try {
+        const storage = ensureStorageAvailable();
+        await storage.ref(cleanPath).delete();
+    } catch {
+        // best-effort
+    }
+}
+
 // Update stats
 function updateStats() {
     const resources = allResources;
@@ -102,7 +151,10 @@ function loadResources(searchTerm = '', sortBy = 'newest') {
                 <div class="resource-info">
                     <h3>${escapeHtml(resource.name)}</h3>
                     ${resource.description ? `<p>${escapeHtml(resource.description)}</p>` : ''}
-                    <a href="${escapeHtml(resource.link)}" target="_blank" rel="noopener noreferrer" class="resource-link">${escapeHtml(resource.link)}</a>
+                    ${resource.storagePath
+                        ? `<div class="resource-link">Storage: ${escapeHtml(resource.storagePath)}</div>`
+                        : (resource.link ? `<a href="${escapeHtml(resource.link)}" target="_blank" rel="noopener noreferrer" class="resource-link">${escapeHtml(resource.link)}</a>` : '')
+                    }
                 </div>
                 <div class="resource-actions">
                     <button class="btn btn-success edit-btn" data-id="${resource.id}">Sửa</button>
@@ -127,11 +179,31 @@ function setupAddForm() {
         const name = document.getElementById('resourceName').value.trim();
         const link = document.getElementById('resourceLink').value.trim();
         const description = document.getElementById('resourceDescription').value.trim();
+        const fileInput = document.getElementById('resourceFile');
+        const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+        if (!file && !link) {
+            showSuccessMessage('Hãy chọn file hoặc nhập link ngoài');
+            return;
+        }
+
+        let fileInfo = null;
+        if (file) {
+            try {
+                fileInfo = await uploadResourceFile(file, name);
+            } catch {
+                showSuccessMessage('Không thể upload file. Kiểm tra Firebase Storage Rules/SDK');
+                return;
+            }
+        }
 
         try {
             await window.firebaseDb.createResource({
                 name,
-                link,
+                link: fileInfo ? '' : link,
+                storagePath: fileInfo ? fileInfo.storagePath : '',
+                fileName: fileInfo ? fileInfo.fileName : '',
+                fileSize: fileInfo ? fileInfo.fileSize : 0,
                 description,
                 createdAt: new Date().toISOString()
             });
@@ -174,13 +246,35 @@ function setupEditForm() {
         const name = document.getElementById('editResourceName').value.trim();
         const link = document.getElementById('editResourceLink').value.trim();
         const description = document.getElementById('editResourceDescription').value.trim();
+        const fileInput = document.getElementById('editResourceFile');
+        const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+        const existing = allResources.find(r => r.id === id);
+
+        let fileInfo = null;
+        if (file) {
+            try {
+                fileInfo = await uploadResourceFile(file, name);
+            } catch {
+                showSuccessMessage('Không thể upload file. Kiểm tra Firebase Storage Rules/SDK');
+                return;
+            }
+        }
         
         try {
             await window.firebaseDb.updateResource(id, {
                 name,
-                link,
+                link: fileInfo ? '' : link,
+                storagePath: fileInfo ? fileInfo.storagePath : (existing ? (existing.storagePath || '') : ''),
+                fileName: fileInfo ? fileInfo.fileName : (existing ? (existing.fileName || '') : ''),
+                fileSize: fileInfo ? fileInfo.fileSize : (existing ? (existing.fileSize || 0) : 0),
                 description
             });
+
+            if (fileInfo && existing && existing.storagePath) {
+                await deleteStorageObject(existing.storagePath);
+            }
+
             await refreshAndRender();
             modal.classList.remove('show');
             showSuccessMessage('Đã cập nhật tài nguyên thành công');
@@ -203,6 +297,8 @@ function setupResourceActions() {
                 document.getElementById('editResourceName').value = resource.name;
                 document.getElementById('editResourceLink').value = resource.link;
                 document.getElementById('editResourceDescription').value = resource.description || '';
+                const fileInput = document.getElementById('editResourceFile');
+                if (fileInput) fileInput.value = '';
                 document.getElementById('editModal').classList.add('show');
             }
         });
@@ -212,10 +308,14 @@ function setupResourceActions() {
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             const id = e.target.dataset.id;
+            const resource = allResources.find(r => r.id === id);
             
             if (confirm('Bạn có chắc chắn muốn xóa tài nguyên này?')) {
                 try {
                     await window.firebaseDb.deleteResource(id);
+                    if (resource && resource.storagePath) {
+                        await deleteStorageObject(resource.storagePath);
+                    }
                     await refreshAndRender();
                     showSuccessMessage('Đã xóa tài nguyên thành công');
                 } catch (err) {

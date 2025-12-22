@@ -1,0 +1,15 @@
+{
+  "name": "webquanlytn",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static site (GitHub Pages) for WebQuanLyTN",
+  "scripts": {
+    "build:js": "node scripts/minify-js.mjs",
+    "obfuscate:js": "node scripts/obfuscate-js.mjs",
+    "build": "npm run build:js && npm run obfuscate:js"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "^4.1.0",
+    "terser": "^5.43.1"
+  }
+}
