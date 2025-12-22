@@ -43,7 +43,7 @@ async function fetchResources() {
 }
 
 // Current filter state
-let currentFilter = 'tool';
+let currentFilter = 'all';
 
 // Load and display downloads
 async function loadDownloads(searchTerm = '', filter = 'all') {
